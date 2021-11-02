@@ -46,6 +46,12 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
   });
 
   const [posts, setPosts] = useState<Post[]>(formattedPost);
+  const [nextPage, setNextPage] = useState(postsPagination.next_page);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  async function handleNextPage(): Promise<void> {
+
+  }
 
   return (
     <>
@@ -72,7 +78,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             </Link>
           ))}
 
-          <button type="button">Carregar mais posts</button>
+          <button type="button" onClick={handleNextPage}>Carregar mais posts</button>
         </div>
       </main>
     </>
