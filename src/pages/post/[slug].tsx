@@ -52,8 +52,21 @@ export default function Post({ post }: PostProps) {
             </ul>
           </div>
 
-
-
+          <article>
+            <h2>titulo da seção</h2>
+            <p>lorem ipsum dolor sit amet, consectetur adipiscing</p>
+            lorem ipsum dolor <strong>
+              {' '}
+              sit amet, consectetur adipiscing
+            </strong>{' '}
+            lorem ipsum dolor sit amet, consectetur adipiscing lorem ipsum dolor
+            sit amet, consectetur
+            <a href="#"> adipiscing lorem ipsum dolor sit amet</a>, consectetur
+            adipiscing lorem ipsum dolor sit amet, consectetur adipiscing lorem
+            ipsum dolor sit amet, consectetur adipiscing lorem ipsum dolor sit
+            amet, consectetur adipiscing lorem ipsum dolor sit amet, consectetur
+            adipiscing
+          </article>
         </div>
       </main>
     </>
