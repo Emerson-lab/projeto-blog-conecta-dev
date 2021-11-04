@@ -1,11 +1,15 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
+import { RichText } from 'prismic-dom';
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
+import Prismic from '@prismicio/client';
+import Head from "next/head"
 import Header from '../../components/Header';
 
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
+import { useRouter } from 'next/router';
 
 interface Post {
   first_publication_date: string | null;
@@ -28,15 +32,26 @@ interface PostProps {
   post: Post;
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ post }: PostProps): JSX.Element {
+  const router = useRouter()
+
+  if(router.isFallback) {
+    return (
+      <h1>Carregando...</h1>
+    )
+  }
+
   return (
     <>
+    <Head>
+      <title>{`${post.data.title} | spacetraveling`}</title>
+    </Head>
       <Header />
-      <img src="/Banner.png" alt="imagem" className={styles.banner} />
+      <img src={post.data.banner.url} alt="imagem" className={styles.banner} />
       <main className={commonStyles.container}>
         <div className={styles.post}>
           <div className={styles.postTop}>
-            <h1>Titulo de exemplo</h1>
+            <h1>{post.data.title}</h1>
             <ul>
               <li>
                 <FiCalendar />
@@ -44,7 +59,7 @@ export default function Post({ post }: PostProps) {
               </li>
               <li>
                 <FiUser />
-                Emerson Trindade
+                {post.data.author}
               </li>
               <li>
                 <FiClock />5 min
@@ -52,21 +67,19 @@ export default function Post({ post }: PostProps) {
             </ul>
           </div>
 
-          <article>
-            <h2>titulo da seção</h2>
-            <p>lorem ipsum dolor sit amet, consectetur adipiscing</p>
-            lorem ipsum dolor <strong>
-              {' '}
-              sit amet, consectetur adipiscing
-            </strong>{' '}
-            lorem ipsum dolor sit amet, consectetur adipiscing lorem ipsum dolor
-            sit amet, consectetur
-            <a href="#"> adipiscing lorem ipsum dolor sit amet</a>, consectetur
-            adipiscing lorem ipsum dolor sit amet, consectetur adipiscing lorem
-            ipsum dolor sit amet, consectetur adipiscing lorem ipsum dolor sit
-            amet, consectetur adipiscing lorem ipsum dolor sit amet, consectetur
-            adipiscing
-          </article>
+          {post.data.content.map(content => {
+            return (
+              <article key={content.heading}>
+                <h2>{content.heading}</h2>
+                <div
+                  className={styles.postContent}
+                  dangerouslySetInnerHTML={{
+                    __html: RichText.asHtml(content.body),
+                  }}
+                />
+              </article>
+            );
+          })}
         </div>
       </main>
     </>
@@ -74,11 +87,21 @@ export default function Post({ post }: PostProps) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  // const prismic = getPrismicClient();
-  // const posts = await prismic.query(TODO);
+  const prismic = getPrismicClient();
+  const posts = await prismic.query([
+    Prismic.Predicates.at('document.type', 'publication'),
+  ]);
+
+  const paths = posts.results.map(post => {
+    return {
+      params: {
+        slug: post.uid,
+      },
+    };
+  });
 
   return {
-    paths: [],
+    paths,
     fallback: true,
   };
 };
@@ -98,10 +121,18 @@ export const getStaticProps: GetStaticProps = async context => {
       banner: {
         url: response.data.banner.url,
       },
-      content: response.data.content,
-    }
-  }
-  console.log(post)
+      content: response.data.content.map(content => {
+        return {
+          heading: content.heading,
+          body: [...content.body],
+        };
+      }),
+    },
+  };
 
-  return {};
+  return {
+    props: {
+      post,
+    },
+  };
 };
