@@ -123,7 +123,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     fallback: true,
   };
 };
-
+//dwad
 export const getStaticProps: GetStaticProps = async ({
   params,
   preview = false,
