@@ -11,7 +11,7 @@ import { getPrismicClient } from '../services/prismic';
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 import { useState } from 'react';
-import Head  from 'next/head';
+import Head from 'next/head';
 
 interface Post {
   uid?: string;
@@ -30,9 +30,13 @@ interface PostPagination {
 
 interface HomeProps {
   postsPagination: PostPagination;
+  preview: boolean;
 }
 
-export default function Home({ postsPagination }: HomeProps): JSX.Element {
+export default function Home({
+  postsPagination,
+  preview,
+}: HomeProps): JSX.Element {
   const formattedPost = postsPagination.results.map(post => {
     return {
       ...post,
@@ -85,10 +89,9 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
 
   return (
     <>
-
-    <Head>
-      <title>Home | Conecta Dev</title>
-    </Head>
+      <Head>
+        <title>Home | Conecta Dev</title>
+      </Head>
       <main className={commonStyles.container}>
         <Header />
 
@@ -118,12 +121,20 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             </button>
           )}
         </div>
+
+        {preview && (
+          <aside>
+            <Link href="/api/exit-preview">
+              <a className={commonStyles.preview}>Sair do modo Preview</a>
+            </Link>
+          </aside>
+        )}
       </main>
     </>
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps = async ({ preview = false }) => {
   const prismic = getPrismicClient();
   const postsResponse = await prismic.query(
     [Prismic.Predicates.at('document.type', 'publication')],
@@ -150,6 +161,7 @@ export const getStaticProps: GetStaticProps = async () => {
   return {
     props: {
       postsPagination,
+      preview,
     },
   };
 };

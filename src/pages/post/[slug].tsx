@@ -13,6 +13,8 @@ import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import { useRouter } from 'next/router';
 
+import Link from 'next/link';
+
 interface Post {
   first_publication_date: string | null;
   data: {
@@ -32,9 +34,10 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  preview: boolean;
 }
 
-export default function Post({ post }: PostProps): JSX.Element {
+export default function Post({ post, preview }: PostProps): JSX.Element {
   const router = useRouter();
 
   const totalWords = post.data.content.reduce((total, contentItem) => {
@@ -99,6 +102,14 @@ export default function Post({ post }: PostProps): JSX.Element {
             );
           })}
         </div>
+
+        {preview && (
+          <aside>
+            <Link href="/api/exit-preview">
+              <a className={commonStyles.preview}>Sair do modo Preview</a>
+            </Link>
+          </aside>
+        )}
       </main>
     </>
   );
@@ -123,7 +134,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     fallback: true,
   };
 };
-//dwad
+
 export const getStaticProps: GetStaticProps = async ({
   params,
   preview = false,
@@ -157,6 +168,7 @@ export const getStaticProps: GetStaticProps = async ({
   return {
     props: {
       post,
+      preview,
     },
   };
 };

@@ -7,7 +7,7 @@ export const accessToken = process.env.PRISMAC_ACCESS_TOKEN;
 
 function linkResolver(doc: Document): string {
   if (doc.type === 'publication') {
-    return `/post/${doc.id}`;
+    return `/post/${doc.uid}`;
   }
   return '/';
 }
